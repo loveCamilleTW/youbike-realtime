@@ -3,6 +3,7 @@ import { Squash as Hamburger } from "hamburger-react";
 import { AppBar, Box, Drawer, Icon, Button } from "@mui/material";
 
 import YOUBIKE_LOGO from "../../assets/logo.svg";
+import { useNavigate } from "react-router-dom";
 
 export function Header() {
   const [isDrawerOpened, setIsDrawerOpened] = useState(false);
@@ -67,7 +68,26 @@ interface NavigationDrawerProps {
 
 function NavigationDrawer(props: NavigationDrawerProps) {
   const { isOpened, onClose } = props;
-  const navItems = ["使用說明", "收費方式", "站點資訊", "最新消息", "活動專區"];
+  const navItems = [
+    {
+      label: "使用說明",
+      url: "usage",
+    },
+    {
+      label: "收費方式",
+      url: "charge",
+    },
+    {
+      label: "站點資訊",
+      url: "info",
+    },
+    {
+      label: "最新消息",
+      url: "news",
+    },
+  ];
+
+  const navigate = useNavigate();
 
   return (
     <Drawer
@@ -95,9 +115,12 @@ function NavigationDrawer(props: NavigationDrawerProps) {
               gap: "2rem",
             }}
           >
-            {navItems.map((navItems) => (
+            {navItems.map((navItem) => (
               <Box
-                key={navItems}
+                onClick={() => {
+                  navigate(`/youbike-realtime/${navItem.url}`);
+                }}
+                key={navItem.label}
                 sx={{
                   flexGrow: "1",
                   backgroundColor: "inherit",
@@ -106,7 +129,7 @@ function NavigationDrawer(props: NavigationDrawerProps) {
                   color: "secondary.contrastText",
                 }}
               >
-                {navItems}
+                {navItem.label}
               </Box>
             ))}
           </Box>

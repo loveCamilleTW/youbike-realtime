@@ -1,12 +1,20 @@
 import { Header, Main } from "@components";
+import { Routes, Route } from "react-router-dom";
 import "./App.css";
 
 function App() {
   return (
-    <>
-      <Header />
-      <Main />
-    </>
+    <Routes>
+      <Route
+        path="/youbike-realtime/*"
+        element={
+          <>
+            <Header />
+            <Main />
+          </>
+        }
+      ></Route>
+    </Routes>
   );
 }
 
