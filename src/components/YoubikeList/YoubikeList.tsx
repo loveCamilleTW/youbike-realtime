@@ -32,9 +32,9 @@ export function YoubikeList(props: YoubikeListProps) {
         {...props}
         sx={{
           borderCollapse: "separate",
+
           tableLayout: "fixed",
           overflowX: "auto",
-          borderRadius: "8px",
         }}
       />
     ),
@@ -49,10 +49,12 @@ export function YoubikeList(props: YoubikeListProps) {
     <Box
       sx={{
         height: "calc(72px * 6)", // 72 * 6
-        borderRadius: "0, 0, 8px, 8px",
-        borderColor: "rgba(174, 174, 174, 1)",
         width: "100%",
         overflow: "scoll",
+        borderColor: "#AEAEAE",
+        borderWidth: "0.5px",
+        borderStyle: "solid",
+        borderRadius: "8px",
       }}
     >
       <TableVirtuoso
@@ -85,7 +87,7 @@ function FixedHeaderContent() {
     {
       width: 150,
       label: "可借車輛",
-      dataKey: "tot",
+      dataKey: "sbi",
     },
     {
       width: 150,
@@ -101,8 +103,9 @@ function FixedHeaderContent() {
           key={column.dataKey}
           variant="head"
           style={{ width: column.width }}
+          align="center"
           sx={{
-            backgroundColor: "#B5CC22",
+            backgroundColor: "secondary.main",
             color: "#FFFFFF",
             height: "66px",
           }}
@@ -120,15 +123,52 @@ function RowContent(index: number, youbikeStation: YoubikeStation) {
 
   return (
     <Fragment>
-      <TableCell sx={{ width: "20rem", background }}>台北市</TableCell>
-      <TableCell sx={{ width: "20rem", background }}>
+      <TableCell
+        align="center"
+        sx={{
+          padding: "1rem",
+          lineHeight: "1.5rem",
+          background,
+        }}
+      >
+        台北市
+      </TableCell>
+      <TableCell
+        align="center"
+        sx={{ width: "20rem", lineHeight: "1.5rem", background }}
+      >
         {youbikeStation.sarea}
       </TableCell>
-      <TableCell sx={{ width: "20rem", background }}>{stationName}</TableCell>
-      <TableCell sx={{ width: "20rem", background }}>
-        {youbikeStation.tot}
+      <TableCell
+        align="center"
+        sx={{ width: "20rem", lineHeight: "1.5rem", background }}
+      >
+        {stationName}
       </TableCell>
-      <TableCell sx={{ width: "20rem", background }}>
+      <TableCell
+        align="center"
+        sx={{
+          width: "20rem",
+          lineHeight: "1.5rem",
+          fontWeight: "700",
+          fontSize: "1.125rem", // 18px
+          color: "secondary.main",
+          background,
+        }}
+      >
+        {youbikeStation.sbi}
+      </TableCell>
+      <TableCell
+        align="center"
+        sx={{
+          width: "20rem",
+          lineHeight: "1.5rem",
+          fontWeight: "700",
+          fontSize: "1.125rem", // 18px
+          color: "secondary.main",
+          background,
+        }}
+      >
         {youbikeStation.bemp}
       </TableCell>
     </Fragment>
