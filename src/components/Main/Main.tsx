@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, SyntheticEvent } from "react";
 
 import { useYoubikeStations } from "@hooks/useYoubikeStations";
 import { YoubikeList } from "@components";
+import { AREAS, TAIWAN_CITIES, City } from "./Area";
 
 import {
   Box,
@@ -9,59 +10,53 @@ import {
   TextField,
   Checkbox,
   FormControlLabel,
-  FormControl,
-  Select,
-  MenuItem,
-  SelectChangeEvent,
+  Typography,
+  Autocomplete,
 } from "@mui/material";
 
-const TAIWAN_CITIES = [
-  "臺北市",
-  "新北市",
-  "桃園市",
-  "臺中市",
-  "臺南市",
-  "高雄市",
-  "新竹縣",
-  "苗栗縣",
-  "彰化縣",
-  "南投縣",
-  "雲林縣",
-  "嘉義縣",
-  "屏東縣",
-  "宜蘭縣",
-  "花蓮縣",
-  "臺東縣",
-  "澎湖縣",
-  "金門縣",
-  "連江縣",
-  "基隆市",
-  "新竹市",
-  "嘉義市",
-];
-
-const TAIPEI_AREAS = [
-  "松山區",
-  "信義區",
-  "大安區",
-  "中山區",
-  "中正區",
-  "大同區",
-  "萬華區",
-  "文山區",
-  "南港區",
-  "內湖區",
-  "士林區",
-  "北投區",
-];
+const MAX_AREA_LENGTH = 50;
 
 export function Main() {
-  const { data: youBikeStations } = useYoubikeStations();
-  const [age, setAge] = useState("");
-  if (!youBikeStations) return null;
+  const { data: youbikeStations } = useYoubikeStations();
+  const [city, setCity] = useState<City>(TAIWAN_CITIES[0]);
+  const [areaCheckBoxes, setAreaCheckBoxes] = useState(
+    new Array(MAX_AREA_LENGTH).fill(true),
+  );
+  const areas = AREAS[city.key];
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value as string);
+  const isAllChecked = areaCheckBoxes.reduce((acc, cur) => acc && cur);
+
+  if (!youbikeStations) return null;
+
+  const stationNames = [
+    ...new Set(
+      youbikeStations.map((youbikeStation) => youbikeStation.sna.split("_")[1]),
+    ),
+  ];
+
+  const chechedAreas: string[] = [];
+  areas.forEach((area, index) => {
+    if (areaCheckBoxes[index]) {
+      chechedAreas.push(area);
+    }
+  });
+
+  const filteredYoubikeStations = youbikeStations.filter((youbikeStation) => {
+    return chechedAreas.includes(youbikeStation.sarea);
+  });
+
+  const handleChange = (_event: SyntheticEvent, newValue: City | null) => {
+    if (!newValue) return;
+    setCity(newValue);
+  };
+
+  const handleCheckboxChange = (index: number) => {
+    return () => {
+      setAreaCheckBoxes((prevState) => {
+        prevState[index] = !prevState[index];
+        return [...prevState];
+      });
+    };
   };
 
   return (
@@ -69,35 +64,104 @@ export function Main() {
       sx={{
         width: "100%",
         padding: "2rem",
+        marginTop: "4.5rem",
       }}
     >
-      <FormControl fullWidth>
-        {/* <InputLabel id="demo-simple-select-label">選擇縣市</InputLabel> */}
-        <Select
-          labelId="city-select-label"
-          id="city-select"
-          value={age}
-          // label="選擇縣市"
-          onChange={handleChange}
-        >
-          {TAIWAN_CITIES.map((city) => (
-            <MenuItem key={city} value={city}>
-              {city}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <Typography
+        variant="h2"
+        sx={{
+          fontWeight: "700",
+          fontSize: "1.125rem",
+          color: "secondary.main",
+        }}
+      >
+        站點資訊
+      </Typography>
 
-      <TextField id="outlined-basic" label="Outlined" variant="outlined" />
+      <Autocomplete
+        disablePortal
+        clearOnEscape
+        id="city-autocomplete"
+        options={TAIWAN_CITIES}
+        sx={{ width: "100%", marginTop: "0.5rem" }}
+        onChange={handleChange}
+        value={city}
+        renderInput={(params: object) => (
+          <TextField
+            {...params}
+            variant="outlined"
+            placeholder="選擇縣市"
+            size="small"
+            color="info"
+            hiddenLabel
+            sx={{
+              backgroundColor: "info.main",
+              "& fieldset": { border: "none" },
+            }}
+          />
+        )}
+      />
+
+      <Autocomplete
+        disablePortal
+        id="combo-box-demo"
+        options={stationNames}
+        sx={{ width: "100%", marginTop: "0.5rem" }}
+        renderInput={(params: object) => (
+          <TextField
+            {...params}
+            variant="outlined"
+            placeholder="搜尋站點"
+            size="small"
+            color="info"
+            hiddenLabel
+            sx={{
+              backgroundColor: "info.main",
+              "& fieldset": { border: "none" },
+            }}
+          />
+        )}
+      />
+
       <Grid container>
-        {TAIPEI_AREAS.map((area) => (
+        <Grid item xs={12}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                color="secondary"
+                checked={isAllChecked}
+                onChange={() => {
+                  if (isAllChecked) {
+                    setAreaCheckBoxes(new Array(MAX_AREA_LENGTH).fill(false));
+                  } else {
+                    setAreaCheckBoxes(new Array(MAX_AREA_LENGTH).fill(true));
+                  }
+                }}
+              />
+            }
+            label={"全部勾選"}
+            sx={{ "& .MuiFormControlLabel-label": { fontSize: "1rem" } }}
+          />
+        </Grid>
+
+        {areas.map((area, index) => (
           <Grid item sm={3} xs={4} key={area}>
-            <FormControlLabel control={<Checkbox />} label={area} />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  color="secondary"
+                  checked={areaCheckBoxes[index]}
+                  onChange={handleCheckboxChange(index)}
+                />
+              }
+              label={area}
+              sx={{ "& .MuiFormControlLabel-label": { fontSize: "1rem" } }}
+            />
           </Grid>
         ))}
       </Grid>
 
-      <YoubikeList data={youBikeStations} />
+      <YoubikeList data={filteredYoubikeStations} />
     </Box>
   );
 }

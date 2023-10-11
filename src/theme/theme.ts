@@ -11,6 +11,10 @@ export const theme = createTheme({
       dark: "#677510",
       contrastText: "#FFFFFF",
     },
+    info: {
+      main: "#F6F6F6",
+      contrastText: "#323232",
+    },
   },
   typography: {
     fontSize: 16,
