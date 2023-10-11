@@ -22,6 +22,7 @@ const MAX_AREA_LENGTH = 50;
 export function Main() {
   const { data: youbikeStations } = useYoubikeStations();
   const [city, setCity] = useState<City>(TAIWAN_CITIES[0]);
+  const [station, setStation] = useState<string | null>("");
   const [areaCheckBoxStates, setAreaCheckBoxStates] = useState(
     new Array(MAX_AREA_LENGTH).fill(true),
   );
@@ -44,13 +45,30 @@ export function Main() {
     }
   });
 
-  const filteredYoubikeStations = youbikeStations.filter((youbikeStation) => {
+  const fiteredByStation =
+    station === null
+      ? youbikeStations
+      : youbikeStations.filter((youbikeStation) => {
+          return youbikeStation.sna.split("_")[1] == station;
+        });
+
+  const filteredYoubikeStations = fiteredByStation.filter((youbikeStation) => {
     return chechedAreas.includes(youbikeStation.sarea);
   });
 
-  const handleChange = (_event: SyntheticEvent, newValue: City | null) => {
+  const handleCityAutoCompleteChange = (
+    _event: SyntheticEvent,
+    newValue: City | null,
+  ) => {
     if (!newValue) return;
     setCity(newValue);
+  };
+
+  const handleStationAutoCompleteChange = (
+    _event: SyntheticEvent,
+    newValue: string | null,
+  ) => {
+    setStation(newValue);
   };
 
   const handleCheckboxChange = (index: number) => {
@@ -82,7 +100,7 @@ export function Main() {
       id="city-autocomplete"
       options={TAIWAN_CITIES}
       sx={{ width: "100%", marginTop: "0.5rem" }}
-      onChange={handleChange}
+      onChange={handleCityAutoCompleteChange}
       value={city}
       renderInput={(params: object) => (
         <TextField
@@ -104,9 +122,12 @@ export function Main() {
   const stationAutocomplete = (
     <Autocomplete
       disablePortal
+      clearOnEscape
       id="combo-box-demo"
       options={stationNames}
       sx={{ width: "100%", marginTop: "0.5rem" }}
+      onChange={handleStationAutoCompleteChange}
+      value={station}
       renderInput={(params: object) => (
         <TextField
           {...params}
@@ -167,7 +188,7 @@ export function Main() {
   const youbikeList = <YoubikeList data={filteredYoubikeStations} />;
 
   return (
-    <MobileMainLayout
+    <MainLayout
       subTitle={subTitle}
       cityAutocomplete={cityAutocomplete}
       stationAutocomplete={stationAutocomplete}
@@ -177,7 +198,7 @@ export function Main() {
   );
 }
 
-interface MobileMainLayoutProps {
+interface MainLayoutProps {
   subTitle: ReactNode;
   cityAutocomplete: ReactNode;
   stationAutocomplete: ReactNode;
@@ -185,7 +206,7 @@ interface MobileMainLayoutProps {
   youbikeList: ReactNode;
 }
 
-function MobileMainLayout(props: MobileMainLayoutProps) {
+function MainLayout(props: MainLayoutProps) {
   const { width } = useWindowDimensions();
 
   const {
