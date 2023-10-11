@@ -22,7 +22,7 @@ const MAX_AREA_LENGTH = 50;
 export function Main() {
   const { data: youbikeStations } = useYoubikeStations();
   const [city, setCity] = useState<City>(TAIWAN_CITIES[0]);
-  const [station, setStation] = useState<string | null>("");
+  const [station, setStation] = useState<string | null>(null);
   const [areaCheckBoxStates, setAreaCheckBoxStates] = useState(
     new Array(MAX_AREA_LENGTH).fill(true),
   );
@@ -46,7 +46,7 @@ export function Main() {
   });
 
   const fiteredByStation =
-    station === null
+    station === null || station === ""
       ? youbikeStations
       : youbikeStations.filter((youbikeStation) => {
           return youbikeStation.sna.split("_")[1] == station;
