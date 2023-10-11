@@ -29,3 +29,9 @@ git clone https://github.com/loveCamilleTW/youbike-realtime.git
 cd youbike-realtime
 npm install && npm run dev
 ```
+
+## Todo list
+
+- [ ] integrate with all cities API
+- [ ] implement sorting functionality on table headers
+- [ ] use Next.js
